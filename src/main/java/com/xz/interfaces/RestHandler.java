@@ -11,7 +11,7 @@ public interface RestHandler {
     Object invokeRest(MethodInfo methodInfo);
 
     /**
-     * 初始化服务器信息
+     * 初始化服务器信息,构建一个rest请求handler
      */
     void init(ServerInfo serverInfo);
 }
