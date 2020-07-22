@@ -7,16 +7,15 @@ import com.xz.interfaces.ProxyCreator;
 import com.xz.interfaces.RestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 
 @Slf4j
 public class JdkProxyCreator implements ProxyCreator {
@@ -32,7 +31,7 @@ public class JdkProxyCreator implements ProxyCreator {
         log.info("serverInfo:{}", serverInfo);
 
 
-        RestHandler restHandler = null;
+        RestHandler restHandler = new WebClientRestHandler();
 
         restHandler.init(serverInfo);
 
@@ -70,6 +69,41 @@ public class JdkProxyCreator implements ProxyCreator {
      */
     public MethodInfo extractMethodInfo(Method method, Object[] args) {
         MethodInfo methodInfo = new MethodInfo();
+        extractUrlAndMethod(method, methodInfo);
+        //构建请求参数
+
+        extractParamsAndBody(method, args, methodInfo);
+
+        return methodInfo;
+    }
+
+    /**
+     * 得到请求的param和body
+     */
+    private void extractParamsAndBody(Method method, Object[] args, MethodInfo methodInfo) {
+        Parameter[] parameters = method.getParameters();
+        LinkedHashMap<String, Object> params = new LinkedHashMap<>();
+        for (int i = 0; i < parameters.length; i++) {
+            PathVariable annotation = parameters[i].getAnnotation(PathVariable.class);
+            //是否有PathVariable注解
+            if (annotation != null) {
+                params.put(annotation.value(), args[i]);
+            }
+            //是否有
+            RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
+            if (requestBody != null) {
+                methodInfo.setBody((Mono<?>) args[i]);
+            }
+        }
+    }
+
+    /**
+     * 得到请求的url和HttpMethod
+     *
+     * @param method
+     * @param methodInfo
+     */
+    private void extractUrlAndMethod(Method method, MethodInfo methodInfo) {
         Annotation[] annotations = method.getAnnotations();
         for (Annotation annotation : annotations) {
             if (annotation instanceof GetMapping) {
@@ -90,9 +124,6 @@ public class JdkProxyCreator implements ProxyCreator {
                 methodInfo.setMethod(HttpMethod.PUT);
             }
         }
-        //构建请求参数
-
-        return null;
     }
 
 }

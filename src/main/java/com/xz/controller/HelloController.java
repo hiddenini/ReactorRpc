@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class HelloController {
@@ -15,6 +16,10 @@ public class HelloController {
 
     @GetMapping(value = "/findAll")
     public Flux<City> getAllCity() {
-        return iCity.getAllCity();
+        iCity.getAllCity();
+        City city = City.builder().cityName("wuhan").description("hot").provinceId(7701l).build();
+        iCity.addCity(Mono.just(city));
+        return null;
     }
+
 }

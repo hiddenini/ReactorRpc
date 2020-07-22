@@ -13,6 +13,6 @@ public class WebClientRestHandler implements RestHandler {
 
     @Override
     public void init(ServerInfo serverInfo) {
-       
+
     }
 }
