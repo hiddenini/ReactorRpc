@@ -16,21 +16,21 @@ public class HelloController {
     @GetMapping(value = "/findAll")
     public Flux<City> getAllCity() {
         Flux<City> allCity = iCity.getAllCity();
-        allCity.subscribe(System.out::println);
+        //allCity.subscribe(System.out::println);
         return allCity;
     }
 
     @GetMapping(value = "/getCityById/{id}")
     public Mono<City> getCityById(@PathVariable("id") String id) {
         Mono<City> cityById = iCity.getCityById(id);
-        cityById.subscribe(System.out::println);
+        //cityById.subscribe(System.out::println);
         return cityById;
     }
 
     @PostMapping(value = "/add")
     public Flux<City> add(@RequestBody City city) {
         Flux<City> cityFlux = iCity.addCity(Mono.just(city));
-        cityFlux.subscribe(System.out::println);
+/*        cityFlux.subscribe(System.out::println);*/
         return cityFlux;
     }
 

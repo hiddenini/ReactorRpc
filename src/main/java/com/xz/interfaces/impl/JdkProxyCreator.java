@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 @Slf4j
@@ -21,7 +20,7 @@ public class JdkProxyCreator implements ProxyCreator {
 
 
     @Override
-    public Object createProxy(Class<?> clazz) {
+    public Object createProxy(Class<?> clazz,RestHandler restHandler) {
 
         log.info("createProxy:{}", clazz);
 
@@ -30,7 +29,7 @@ public class JdkProxyCreator implements ProxyCreator {
         log.info("serverInfo:{}", serverInfo);
 
 
-        RestHandler restHandler = new WebClientRestHandler();
+        //RestHandler restHandler = new WebClientRestHandler();
 
         restHandler.init(serverInfo);
 
