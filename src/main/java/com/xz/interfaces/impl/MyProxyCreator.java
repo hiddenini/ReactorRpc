@@ -7,6 +7,7 @@ import com.xz.interfaces.ProxyCreator;
 import com.xz.interfaces.RestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,7 +17,8 @@ import java.lang.reflect.*;
 import java.util.LinkedHashMap;
 
 @Slf4j
-public class JdkProxyCreator implements ProxyCreator {
+//@Component
+public class MyProxyCreator implements ProxyCreator {
 
 
     @Override
@@ -48,7 +50,7 @@ public class JdkProxyCreator implements ProxyCreator {
                     /**
                      * 调用rest接口 ,这里使用webClient,后面可能会有其他实现,所以抽象成接口
                      */
-                    log.info("JdkProxyCreator createProxy");
+                    log.info("MyProxyCreator createProxy");
                     return restHandler.invokeRest(methodInfo);
                 }
         );

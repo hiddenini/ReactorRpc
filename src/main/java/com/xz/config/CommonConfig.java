@@ -14,16 +14,18 @@ import org.springframework.context.annotation.Configuration;
 public class CommonConfig {
 
     @Bean
+    @ConditionalOnMissingBean
     ProxyCreator jdkProxyCreator() {
         return new JdkProxyCreator();
     }
 
     /**
      * 这里为了做成类型配置的形式,将RestHandler设置为ProxyCreator中共的createProxy方法的参数,
-     *
+     * <p>
      * 但是这里很别扭,如果外部使用cglib进行动态代理的话,需要实现的方法里面带上了RestHandler
-     *
+     * <p>
      * 这个RestHandler的实例是在这里被初始化的
+     *
      * @return
      */
     @Bean
@@ -54,7 +56,7 @@ public class CommonConfig {
             @Override
             public ICityApi getObject() {
 
-                return (ICityApi) proxyCreator.createProxy(getObjectType(),restHandler);
+                return (ICityApi) proxyCreator.createProxy(getObjectType(), restHandler);
             }
 
             @Override
