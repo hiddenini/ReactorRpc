@@ -8,12 +8,11 @@ import com.xz.interfaces.RestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
@@ -74,7 +73,25 @@ public class JdkProxyCreator implements ProxyCreator {
 
         extractParamsAndBody(method, args, methodInfo);
 
+        //提取返回对象信息
+        extractReturnInfo(method, methodInfo);
+
         return methodInfo;
+    }
+
+    private void extractReturnInfo(Method method, MethodInfo methodInfo) {
+        //返回 flux还是mono
+        boolean assignableFrom = method.getReturnType().isAssignableFrom(Flux.class);
+        methodInfo.setReturnFlux(assignableFrom);
+        //获取返回对象的实际类型
+        methodInfo.setReturnElementType(extractElementType(method.getGenericReturnType()));
+    }
+
+
+    private Class extractElementType(Type genericReturnType) {
+        ParameterizedType parameterizedType = (ParameterizedType) genericReturnType;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        return (Class) actualTypeArguments[0];
     }
 
     /**
@@ -93,8 +110,10 @@ public class JdkProxyCreator implements ProxyCreator {
             RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
             if (requestBody != null) {
                 methodInfo.setBody((Mono<?>) args[i]);
+                methodInfo.setBodyElementType(extractElementType(parameters[i].getParameterizedType()));
             }
         }
+        methodInfo.setParams(params);
     }
 
     /**
